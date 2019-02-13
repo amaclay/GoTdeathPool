@@ -1,0 +1,125 @@
+---
+title: "Game of Thrones Death Pool"
+runtime: shiny
+output: html_document
+---
+<style>
+.plotly {
+height: 225px !important;
+}
+</style>
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Load resources
+setwd("~/Documents/Entertainment/GoTdeathPool")
+library(shiny)
+library(tidyverse)
+library(DT)
+library(plotly)
+
+key <- read.csv("GoTdeathPool_key.csv")
+picks <- rbind(
+  read.csv("GoTdeathPool_key.csv") %>% mutate(Person = "key"),
+  read.csv("GoTdeathPool_al.csv") %>% mutate(Person = "al"),
+  read.csv("GoTdeathPool_bw.csv") %>% mutate(Person = "bw"),
+  read.csv("GoTdeathPool_df.csv") %>% mutate(Person = "df"),
+  read.csv("GoTdeathPool_jk.csv") %>% mutate(Person = "jk"),
+  read.csv("GoTdeathPool_ms.csv") %>% mutate(Person = "ms"),
+  read.csv("GoTdeathPool_ng.csv") %>% mutate(Person = "ng"),
+  read.csv("GoTdeathPool_rf.csv") %>% mutate(Person = "rf"),
+  read.csv("GoTdeathPool_td.csv") %>% mutate(Person = "td"),
+  read.csv("GoTdeathPool_am.csv") %>% mutate(Person = "am"))
+```
+
+
+```{r, echo=FALSE}
+# Tabular datatables of each Person's picks, colored by correctness (correct: green, wrong: red, NA: gray/clear)
+picks_chars <- picks %>%
+  filter(!is.na(Wight.White.Walker)) %>%
+  mutate(Alive.Dead = case_when(Wight.White.Walker == "1" ~ "2", 
+                                TRUE ~ Alive.Dead)) %>%
+  select(-Wight.White.Walker) %>%
+  mutate(Alive.Dead = factor(Alive.Dead, levels = 0:2, labels = c("Dead", "Alive", "White Walker")))
+picks_key <- picks_chars %>% filter(Person == "key") %>% select(-Person)
+picks_chars <- picks_chars %>% 
+  filter(Person != "key")
+picks_chars$correct <- NA
+for (char in picks_chars$Character) {
+  picks_chars$correct[which(picks_chars$Character == char)] <- picks_chars$Alive.Dead[which(picks_chars$Character == char)] == picks_key$Alive.Dead[which(picks_key$Character == char)]
+}
+
+standings <- picks_chars %>%
+  mutate(Score = case_when(correct & Alive.Dead == "White Walker" ~ 2,
+                           correct ~ 1,
+                           TRUE ~ 0)) %>%
+  group_by(Person) %>%
+  summarise(score = sum(correct)) %>%
+  mutate(Person = c("Andy", "Maclay", "Bryan", "David", "Jasmine", "Mark", "Neale", "Ryan", "Tony")) %>%
+  arrange(desc(score))
+
+# Output: Tabset w/ plot, summary, and table ----
+fluidRow(
+  column(6,
+         div(style = "height:63px;margin:auto;", h2("Standings")),
+    #standings
+    renderDataTable(datatable(standings, options = list(paging = F, searching = F)))
+  ),
+  column(6,
+tabsetPanel(
+  tabPanel("Key", renderDataTable(picks_key , options = list(paging=F, searching=F), rownames=F)), 
+  tabPanel("Andy", renderDataTable(datatable(picks_chars %>% filter(Person == "al") %>% select(-Person), options = list(paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+                                     formatStyle("Alive.Dead", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))
+             )), 
+  tabPanel("Bryan", renderDataTable(datatable(picks_chars %>% filter(Person == "bw") %>% select(-Person), options = list(paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+            formatStyle("Alive.Dead", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE'))))), 
+  tabPanel("David", renderDataTable(datatable(picks_chars %>% filter(Person == "df") %>% select(-Person), options = list(paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+            formatStyle("Alive.Dead", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE'))))), 
+  tabPanel("Jasmine", renderDataTable(datatable(picks_chars %>% filter(Person == "jk") %>% select(-Person), options = list(paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+            formatStyle("Alive.Dead", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE'))))), 
+  tabPanel("Maclay", renderDataTable(datatable(picks_chars %>% filter(Person == "am") %>% select(-Person), options = list(paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+           formatStyle("Alive.Dead", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE'))))), 
+  tabPanel("Mark", renderDataTable(datatable(picks_chars %>% filter(Person == "ms") %>% select(-Person), options = list(paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+         formatStyle("Alive.Dead", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE'))))), 
+  tabPanel("Neale", renderDataTable(datatable(picks_chars %>% filter(Person == "ng") %>% select(-Person), options = list(paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+          formatStyle("Alive.Dead", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE'))))), 
+  tabPanel("Ryan", renderDataTable(datatable(picks_chars %>% filter(Person == "rf") %>% select(-Person), options = list(paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+         formatStyle("Alive.Dead", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE'))))), 
+  tabPanel("Tony", renderDataTable(datatable(picks_chars %>% filter(Person == "td") %>% select(-Person), options = list(paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+         formatStyle("Alive.Dead", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))))
+)))
+# renderDataTable({
+#   picks_chars %>% 
+#     spread(key = Person, value = Alive.Dead) %>% 
+#     select(Character, key, al, bw, df, jk, am, ms, ng, rf, td) %>%
+#     rename(Key = "key", Andy = "al", Bryan = "bw", David = "df", Jasmine = "jk", Maclay = "am", Mark = "ms", Neale = "ng", Ryan = "rf", Tony = "td")
+# }, options = list(
+#    columnDefs = list(list(className = 'dt-center', targets = 0:9))
+# ))
+```
+<center> <h1> Pick Distribution </h1> </center>
+```{r pressure, echo=FALSE}
+# Summary plots: pie charts for each choice (alive: black, dead: gray, wight: white)
+
+char_death <- list()
+picks_chars_formatted <- picks_chars %>% filter(Person != "key") %>% group_by(Character, Alive.Dead) %>% count()
+for (char in unique(picks_chars$Character)) {
+  formatted_subset <- picks_chars_formatted %>% filter(Character == char)
+  char_death[[char]] <- plot_ly(formatted_subset,
+                                labels = ~Alive.Dead,
+                                values = ~n,
+                                type = "pie",
+                                height = 200) %>%
+    layout(title = char,
+           xaxis = list(showgrid = FALSE,zeroline = FALSE,showticklabes = FALSE),
+           yaxis = list(showgrid = FALSE,zeroline = FALSE,showticklabes = FALSE),
+           margin = list(l = 0, r = 0, b = 0, t = 30, pad = 0),
+           showlegend = FALSE) %>%
+    config(displayModeBar = F)
+}
+fluidRow(
+  div(style = "height:250px",
+    lapply(char_death, function (x) column(width = 3, renderPlotly(x))))
+)
+```
+
+
