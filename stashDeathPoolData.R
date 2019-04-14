@@ -6,18 +6,17 @@ library(tidyverse)
 library(DT)
 library(plotly)
 
-key <- read.csv("GoTdeathPool_key.csv")
 picks <- rbind(
-  read.csv("GoTdeathPool_key.csv") %>% mutate(Person = "key"),
-  read.csv("GoTdeathPool_al.csv") %>% mutate(Person = "al"),
-  read.csv("GoTdeathPool_bw.csv") %>% mutate(Person = "bw"),
-  read.csv("GoTdeathPool_df.csv") %>% mutate(Person = "df"),
-  read.csv("GoTdeathPool_jk.csv") %>% mutate(Person = "jk"),
-  read.csv("GoTdeathPool_ms.csv") %>% mutate(Person = "ms"),
-  read.csv("GoTdeathPool_ng.csv") %>% mutate(Person = "ng"),
-  read.csv("GoTdeathPool_rf.csv") %>% mutate(Person = "rf"),
-  read.csv("GoTdeathPool_td.csv") %>% mutate(Person = "td"),
-  read.csv("GoTdeathPool_am.csv") %>% mutate(Person = "am"))
+  read.csv("data/GoTdeathPool_key.csv") %>% mutate(Person = "key"),
+  read.csv("data/GoTdeathPool_al.csv") %>% mutate(Person = "al"),
+  read.csv("data/GoTdeathPool_bw.csv") %>% mutate(Person = "bw"),
+  read.csv("data/GoTdeathPool_df.csv") %>% mutate(Person = "df"),
+  read.csv("data/GoTdeathPool_jk.csv") %>% mutate(Person = "jk"),
+  read.csv("data/GoTdeathPool_ms.csv") %>% mutate(Person = "ms"),
+  read.csv("data/GoTdeathPool_ng.csv") %>% mutate(Person = "ng"),
+  read.csv("data/GoTdeathPool_rf.csv") %>% mutate(Person = "rf"),
+  read.csv("data/GoTdeathPool_td.csv") %>% mutate(Person = "td"),
+  read.csv("data/GoTdeathPool_am.csv") %>% mutate(Person = "am"))
 
 # Tabular datatables of each Person's picks, colored by correctness (correct: green, wrong: red, NA: gray/clear)
 picks_chars <- picks %>%
@@ -49,12 +48,23 @@ standings <- picks_chars %>%
 
 char_death <- list()
 picks_chars_formatted <- picks_chars %>% filter(Person != "key") %>% group_by(Character, Status) %>% count()
+pal <- c("Alive" = "#1577b4", "Dead" = "#ff7f0e", "White Walker" = "#7f7f7f")
+mapColors <- data.frame(Status = names(pal),
+                        color = unname(pal),
+                        stringsAsFactors = F)
+# picks_chars_formatted <- picks_chars_formatted %>%
+#   mutate(color = mapColors$Status)
 for (char in unique(picks_chars$Character)) {
   formatted_subset <- picks_chars_formatted %>% filter(Character == char)
+  mapColorsSub <- mapColors[match(formatted_subset$Status, mapColors$Status), 'color']
   char_death[[char]] <- plot_ly(formatted_subset,
                                 labels = ~Status,
                                 values = ~n,
                                 type = "pie",
+                                marker = list(color = ~Status,
+                                              colors = mapColorsSub),
+                                # color = ~Status,
+                                # colors = mapColorsSub,
                                 height = 200) %>%
     layout(title = char,
            xaxis = list(showgrid = FALSE,zeroline = FALSE,showticklabes = FALSE),
@@ -66,4 +76,5 @@ for (char in unique(picks_chars$Character)) {
 
 save(standings, picks_key, picks_chars, char_death, file = "data/data.RData")
 
+# rmarkdown::render('GoTdeathPool.Rmd',output_file = "index.html")
 
