@@ -1,3 +1,5 @@
+# Who should you root for?
+# Pick dead and majority alives
 
 # Load resources
 setwd("~/Documents/Entertainment/GoTdeathPool")
@@ -48,19 +50,12 @@ for (char in picks_key$Character) {
   picks_chars$correct[which(picks_chars$Character == char)] <- picks_chars$Pick[which(picks_chars$Character == char)] == picks_key$Pick[which(picks_key$Character == char)]
   # set correct to FALSE if wight selected incorrectly
   wight_key <- picks_key$Wight[which(picks_key$Character == char)]
-  print(char)
-  print(wight_key)
-  if (char == "Jorah Mormont") print(picks_chars %>% filter(Person == "am", Character == "Jorah Mormont") %>% pull(correct))
-  if (char == "Jorah Mormont") print(picks_chars %>% filter(Person == "am", Character == "Jorah Mormont") %>% pull(Character))
-  if (char == "Jorah Mormont") print(picks_chars %>% filter(Person == "am", Character == "Jorah Mormont") %>% pull(Wight))
-  if (char == "Jorah Mormont") print(wight_key)
   picks_chars <- picks_chars %>%
     mutate(correct = case_when(correct &
                                  Character == char &
                                  Wight == "1" &
                                  wight_key == "0" ~ FALSE,
                                TRUE ~ correct))
-  if (char == "Jorah Mormont") print(picks_chars %>% filter(Person == "am", Character == "Jorah Mormont") %>% pull(correct))
 }
 
 standings <- picks_chars %>%

@@ -36,7 +36,7 @@ fluidRow(
     #standings
     datatable(standings, options = list(paging = F, searching = F, w = F))),
 column(6, tabsetPanel(
-  tabPanel("Pick", datatable(picks_key , options = list(scrollY = "500px", paging=F, searching=F), rownames=F)), 
+  tabPanel("Pick", datatable(picks_key , options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F)), 
   tabPanel("Andy", datatable(picks_chars %>% filter(Person == "al") %>% select(-Person), options = list(scrollY = "500px", scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
             formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
   tabPanel("Bryan", datatable(picks_chars %>% filter(Person == "bw") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
