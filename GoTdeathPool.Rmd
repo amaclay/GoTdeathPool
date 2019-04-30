@@ -37,23 +37,23 @@ fluidRow(
     datatable(standings, options = list(paging = F, searching = F, w = F))),
 column(6, tabsetPanel(
   tabPanel("Pick", datatable(picks_key , options = list(scrollY = "500px", paging=F, searching=F), rownames=F)), 
-  tabPanel("Andy", datatable(picks_chars %>% filter(Person == "al") %>% select(-Person), options = list(scrollY = "500px", scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+  tabPanel("Andy", datatable(picks_chars %>% filter(Person == "al") %>% select(-Person), options = list(scrollY = "500px", scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
             formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-  tabPanel("Bryan", datatable(picks_chars %>% filter(Person == "bw") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+  tabPanel("Bryan", datatable(picks_chars %>% filter(Person == "bw") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
             formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-  tabPanel("David", datatable(picks_chars %>% filter(Person == "df") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+  tabPanel("David", datatable(picks_chars %>% filter(Person == "df") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
             formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-  tabPanel("Jasmine", datatable(picks_chars %>% filter(Person == "jk") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+  tabPanel("Jasmine", datatable(picks_chars %>% filter(Person == "jk") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
             formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-  tabPanel("Maclay", datatable(picks_chars %>% filter(Person == "am") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+  tabPanel("Maclay", datatable(picks_chars %>% filter(Person == "am") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
            formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-  tabPanel("Mark", datatable(picks_chars %>% filter(Person == "ms") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+  tabPanel("Mark", datatable(picks_chars %>% filter(Person == "ms") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
          formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-  tabPanel("Neale", datatable(picks_chars %>% filter(Person == "ng") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+  tabPanel("Neale", datatable(picks_chars %>% filter(Person == "ng") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
           formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-  tabPanel("Ryan", datatable(picks_chars %>% filter(Person == "rf") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+  tabPanel("Ryan", datatable(picks_chars %>% filter(Person == "rf") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
          formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-  tabPanel("Tony", datatable(picks_chars %>% filter(Person == "td") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F) %>%
+  tabPanel("Tony", datatable(picks_chars %>% filter(Person == "td") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
          formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE'))))
 )))
 br()

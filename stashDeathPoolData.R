@@ -24,8 +24,7 @@ picks <- rbind(
 picks_chars <- picks %>%
   # filter(Person == "df" | Person == "key") %>%
   # Combine Alive.Dead and Wight.White.Walker
-  mutate(Alive.Dead = case_when(Wight.White.Walker == "1" ~ "Wight", 
-                                !is.na(Wight.White.Walker) & Alive.Dead == "0" ~ "Dead",
+  mutate(Alive.Dead = case_when(!is.na(Wight.White.Walker) & Alive.Dead == "0" ~ "Dead",
                                 !is.na(Wight.White.Walker) & Alive.Dead == "1" ~ "Alive",
                                 any(Character %in% c("danny_preg", "dead_night_king", "babby_survive")) & Alive.Dead == "0" ~ "No",
                                 any(Character %in% c("danny_preg", "dead_night_king", "babby_survive")) & Alive.Dead == "1" ~ "Yes",
@@ -36,8 +35,8 @@ picks_chars <- picks %>%
                                Character == "night_king_killer" ~ "NK Killer",
                                Character == "iron_throne" ~ "7 Kingdoms Champ",
                                TRUE ~ Character)) %>%
-  select(-Wight.White.Walker) %>%
-  rename(Pick = "Alive.Dead")
+  rename(Pick = "Alive.Dead",
+         Wight = "Wight.White.Walker")
 # Split key from participants
 picks_key <- picks_chars %>% filter(Person == "key") %>% select(-Person)
 picks_chars <- picks_chars %>% 
@@ -45,18 +44,38 @@ picks_chars <- picks_chars %>%
 
 # Correctness
 picks_chars$correct <- NA
-for (char in unique(picks_chars$Character)) {
+for (char in picks_key$Character) {
   picks_chars$correct[which(picks_chars$Character == char)] <- picks_chars$Pick[which(picks_chars$Character == char)] == picks_key$Pick[which(picks_key$Character == char)]
+  # set correct to FALSE if wight selected incorrectly
+  wight_key <- picks_key$Wight[which(picks_key$Character == char)]
+  print(char)
+  print(wight_key)
+  if (char == "Jorah Mormont") print(picks_chars %>% filter(Person == "am", Character == "Jorah Mormont") %>% pull(correct))
+  if (char == "Jorah Mormont") print(picks_chars %>% filter(Person == "am", Character == "Jorah Mormont") %>% pull(Character))
+  if (char == "Jorah Mormont") print(picks_chars %>% filter(Person == "am", Character == "Jorah Mormont") %>% pull(Wight))
+  if (char == "Jorah Mormont") print(wight_key)
+  picks_chars <- picks_chars %>%
+    mutate(correct = case_when(correct &
+                                 Character == char &
+                                 Wight == "1" &
+                                 wight_key == "0" ~ FALSE,
+                               TRUE ~ correct))
+  if (char == "Jorah Mormont") print(picks_chars %>% filter(Person == "am", Character == "Jorah Mormont") %>% pull(correct))
 }
 
 standings <- picks_chars %>%
-  mutate(Score = case_when(correct & Pick == "Wight" ~ 2,
+  mutate(Score = case_when(correct & Wight == "1" ~ 2,
                            correct ~ 1,
                            TRUE ~ 0)) %>%
   group_by(Person) %>%
   summarise(Score = sum(Score)) %>%
   mutate(Person = c("Andy", "Maclay", "Bryan", "David", "Jasmine", "Mark", "Neale", "Ryan", "Tony")) %>%
   arrange(desc(Score))
+
+# Overwrite Pick label if wight
+picks_chars <- picks_chars %>%
+  mutate(Pick = case_when(Wight == "1" ~ "Wight",
+                          TRUE ~ Pick))
 
 char_death <- list()
 picks_chars_formatted <- picks_chars %>%
