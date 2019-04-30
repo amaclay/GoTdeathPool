@@ -34,7 +34,7 @@ picks_chars <- picks %>%
                                Character == "babby_survive" ~ "Baby Survives",
                                Character == "dead_night_king" ~ "NK Dies",
                                Character == "night_king_killer" ~ "NK Killer",
-                               Character == "iron_throne" ~ "Champ of the 7 Kingdoms",
+                               Character == "iron_throne" ~ "7 Kingdoms Champ",
                                TRUE ~ Character)) %>%
   select(-Wight.White.Walker) %>%
   rename(Pick = "Alive.Dead")
