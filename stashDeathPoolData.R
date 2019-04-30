@@ -6,6 +6,8 @@ library(tidyverse)
 library(DT)
 library(plotly)
 
+options(stringsAsFactors = F)
+
 picks <- rbind(
   read.csv("data/GoTdeathPool_key.csv") %>% mutate(Person = "key"),
   read.csv("data/GoTdeathPool_al.csv") %>% mutate(Person = "al"),
@@ -20,24 +22,35 @@ picks <- rbind(
 
 # Tabular datatables of each Person's picks, colored by correctness (correct: green, wrong: red, NA: gray/clear)
 picks_chars <- picks %>%
-  filter(!is.na(Wight.White.Walker)) %>%
-  mutate(Alive.Dead = case_when(Wight.White.Walker == "1" ~ "2", 
-                                TRUE ~ Alive.Dead)) %>%
+  # filter(Person == "df" | Person == "key") %>%
+  # Combine Alive.Dead and Wight.White.Walker
+  mutate(Alive.Dead = case_when(Wight.White.Walker == "1" ~ "Wight", 
+                                !is.na(Wight.White.Walker) & Alive.Dead == "0" ~ "Dead",
+                                !is.na(Wight.White.Walker) & Alive.Dead == "1" ~ "Alive",
+                                any(Character %in% c("danny_preg", "dead_night_king", "babby_survive")) & Alive.Dead == "0" ~ "No",
+                                any(Character %in% c("danny_preg", "dead_night_king", "babby_survive")) & Alive.Dead == "1" ~ "Yes",
+                                TRUE ~ as.character(Alive.Dead)),
+         Character = case_when(Character == "danny_preg" ~ "Danny Pregnant",
+                               Character == "babby_survive" ~ "Baby Survives",
+                               Character == "dead_night_king" ~ "NK Dies",
+                               Character == "night_king_killer" ~ "NK Killer",
+                               Character == "iron_throne" ~ "Champ of the 7 Kingdoms",
+                               TRUE ~ Character)) %>%
   select(-Wight.White.Walker) %>%
-  mutate(Alive.Dead = factor(Alive.Dead, levels = 0:2, labels = c("Dead", "Alive", "White Walker"))) %>%
-  rename(Status = "Alive.Dead")
+  rename(Pick = "Alive.Dead")
+# Split key from participants
 picks_key <- picks_chars %>% filter(Person == "key") %>% select(-Person)
 picks_chars <- picks_chars %>% 
   filter(Person != "key")
 
 # Correctness
 picks_chars$correct <- NA
-for (char in picks_chars$Character) {
-  picks_chars$correct[which(picks_chars$Character == char)] <- picks_chars$Status[which(picks_chars$Character == char)] == picks_key$Status[which(picks_key$Character == char)]
+for (char in unique(picks_chars$Character)) {
+  picks_chars$correct[which(picks_chars$Character == char)] <- picks_chars$Pick[which(picks_chars$Character == char)] == picks_key$Pick[which(picks_key$Character == char)]
 }
 
 standings <- picks_chars %>%
-  mutate(Score = case_when(correct & Status == "White Walker" ~ 2,
+  mutate(Score = case_when(correct & Pick == "Wight" ~ 2,
                            correct ~ 1,
                            TRUE ~ 0)) %>%
   group_by(Person) %>%
@@ -45,33 +58,61 @@ standings <- picks_chars %>%
   mutate(Person = c("Andy", "Maclay", "Bryan", "David", "Jasmine", "Mark", "Neale", "Ryan", "Tony")) %>%
   arrange(desc(Score))
 
-
 char_death <- list()
-picks_chars_formatted <- picks_chars %>% filter(Person != "key") %>% group_by(Character, Status) %>% count()
-pal <- c("Alive" = "#1577b4", "Dead" = "#ff7f0e", "White Walker" = "#7f7f7f")
-mapColors <- data.frame(Status = names(pal),
+picks_chars_formatted <- picks_chars %>%
+  mutate(Pick = case_when(is.na(Pick) ~ "NA",
+                          TRUE ~ Pick)) %>%
+  group_by(Character, Pick) %>% 
+  count()
+pal <- c("Alive" = "#1577b4", "Dead" = "#ff7f0e", "Wight" = "#7f7f7f")
+mapColors <- data.frame(Pick = names(pal),
                         color = unname(pal),
                         stringsAsFactors = F)
-# picks_chars_formatted <- picks_chars_formatted %>%
-#   mutate(color = mapColors$Status)
+i <- 0
 for (char in unique(picks_chars$Character)) {
   formatted_subset <- picks_chars_formatted %>% filter(Character == char)
-  mapColorsSub <- mapColors[match(formatted_subset$Status, mapColors$Status), 'color']
-  char_death[[char]] <- plot_ly(formatted_subset,
-                                labels = ~Status,
-                                values = ~n,
-                                type = "pie",
-                                marker = list(color = ~Status,
-                                              colors = mapColorsSub),
-                                # color = ~Status,
-                                # colors = mapColorsSub,
-                                height = 200) %>%
-    layout(title = char,
-           xaxis = list(showgrid = FALSE,zeroline = FALSE,showticklabes = FALSE),
-           yaxis = list(showgrid = FALSE,zeroline = FALSE,showticklabes = FALSE),
-           margin = list(l = 0, r = 0, b = 0, t = 30, pad = 0),
-           showlegend = FALSE) %>%
-    config(displayModeBar = F)
+  if (i < 39) {
+    # Custom color mapping for character alive/dead
+    mapColorsSub <- mapColors[match(formatted_subset$Pick, mapColors$Pick), 'color']
+    char_death[[char]] <- plot_ly(formatted_subset,
+                                  labels = ~Pick,
+                                  values = ~n,
+                                  text = ~paste0(Pick, "\n", round((n / sum(n))*100, 0), "%"),
+                                  textinfo='text',
+                                  type = "pie",
+                                  hoverinfo="none",
+                                  textposition="inside",
+                                  marker = list(color = ~Pick,
+                                                colors = mapColorsSub),
+                                  # color = ~Pick,
+                                  # colors = mapColorsSub,
+                                  height = 200) %>%
+      layout(title = char,
+             xaxis = list(showgrid = FALSE,zeroline = FALSE,showticklabes = FALSE),
+             yaxis = list(showgrid = FALSE,zeroline = FALSE,showticklabes = FALSE),
+             margin = list(l = 0, r = 0, b = 0, t = 30, pad = 0),
+             showlegend = FALSE) %>%
+      config(displayModeBar = F)
+  } else { 
+    # No custom color mapping
+    char_death[[char]] <- plot_ly(formatted_subset,
+                                  labels = ~Pick,
+                                  values = ~n,
+                                  text = ~paste0(round((n / sum(n))*100, 0), "%"),
+                                  textinfo = 'text',
+                                  textposition="inside",
+                                  hoverinfo="text",
+                                  hovertext = formatted_subset$Pick,
+                                  type = "pie",
+                                  height = 200) %>%
+      layout(title = char,
+             xaxis = list(showgrid = FALSE,zeroline = FALSE,showticklabes = FALSE),
+             yaxis = list(showgrid = FALSE,zeroline = FALSE,showticklabes = FALSE),
+             margin = list(l = 0, r = 0, b = 0, t = 30, pad = 0),
+             showlegend = FALSE) %>%
+      config(displayModeBar = F)
+  }
+  i <- i + 1
 }
 
 save(standings, picks_key, picks_chars, char_death, file = "data/data.RData")
