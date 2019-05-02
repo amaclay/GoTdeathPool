@@ -1,5 +1,6 @@
 # Who should you root for?
 # Pick dead and majority alives
+# How many picked against me
 
 # Load resources
 setwd("~/Documents/Entertainment/GoTdeathPool")
@@ -78,6 +79,10 @@ picks_chars_formatted <- picks_chars %>%
                           TRUE ~ Pick)) %>%
   group_by(Character, Pick) %>% 
   count()
+
+source("clutch_picks.R")
+picks_chars <- markClutchPicks(picks_chars, picks_chars_formatted)
+
 pal <- c("Alive" = "#1577b4", "Dead" = "#ff7f0e", "Wight" = "#7f7f7f")
 mapColors <- data.frame(Pick = names(pal),
                         color = unname(pal),
