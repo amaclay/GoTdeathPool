@@ -83,6 +83,8 @@ for (week in 0:WEEK) {
   
   standings <- picks_chars %>%
     mutate(Score = case_when(correct & Wight == "1" ~ 2,
+                             correct & Character == "NK Killer" ~ 2,
+                             correct & Character == "7 Kingdoms Champ" ~ 5,
                              correct ~ 1,
                              TRUE ~ 0)) %>%
     filter(!is.na(correct)) %>%
@@ -185,7 +187,7 @@ trace_am <- all_standings %>% filter(Person == "Maclay") %>% pull(score)
 standingsProgression <- plot_ly(trace_al, name = "Andy", mode = 'lines+markers',
                                 x = ~week, y = ~score, type = 'scatter', height = '300', width = '500') %>%
   add_trace(y = ~trace_bw, name = 'Bryan', mode = 'lines+markers') %>%
-  add_trace(y = ~trace_df, name = 'Tony', mode = 'lines+markers') %>%
+  add_trace(y = ~trace_df, name = 'David', mode = 'lines+markers') %>%
   add_trace(y = ~trace_jk, name = 'Jasmine', mode = 'lines+markers') %>%
   add_trace(y = ~trace_ms, name = 'Mark', mode = 'lines+markers') %>%
   add_trace(y = ~trace_ng, name = 'Neale', mode = 'lines+markers') %>%
