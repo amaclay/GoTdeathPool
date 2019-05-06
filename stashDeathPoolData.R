@@ -1,6 +1,5 @@
-# Who should you root for?
-# Pick dead and majority alives
-# How many picked against me
+# Potential points left
+# place to all_standings
 
 # Load resources
 setwd("~/Documents/Entertainment/GoTdeathPool")
@@ -11,20 +10,32 @@ library(plotly)
 
 options(stringsAsFactors = F)
 
-picks <- rbind(
-  read.csv("data/GoTdeathPool_key.csv") %>% mutate(Person = "key"),
-  read.csv("data/GoTdeathPool_al.csv") %>% mutate(Person = "al"),
-  read.csv("data/GoTdeathPool_bw.csv") %>% mutate(Person = "bw"),
-  read.csv("data/GoTdeathPool_df.csv") %>% mutate(Person = "df"),
-  read.csv("data/GoTdeathPool_jk.csv") %>% mutate(Person = "jk"),
-  read.csv("data/GoTdeathPool_ms.csv") %>% mutate(Person = "ms"),
-  read.csv("data/GoTdeathPool_ng.csv") %>% mutate(Person = "ng"),
-  read.csv("data/GoTdeathPool_rf.csv") %>% mutate(Person = "rf"),
-  read.csv("data/GoTdeathPool_td.csv") %>% mutate(Person = "td"),
-  read.csv("data/GoTdeathPool_am.csv") %>% mutate(Person = "am"))
+WEEK <- 4
+ambiguousChars <- c("Hot Pie", "Meera Reed", "Robert Arryn", "Edmure Tully", "Daario Naharis", "Elia Sand")
+
+fileMap <- c(key_week0 = "key0",
+             key_week1 = "key1",
+             key_week2 = "key2",
+             key_week3 = "key3",
+             key_week4 = "key4",
+             al = "Andy",
+             bw = "Bryan",
+             df = "David",
+             jk = "Jasmine",
+             ms = "Mark",
+             ng = "Neale",
+             rf = "Ryan",
+             td = "Tony",
+             am = "Maclay")
+
+picks <- data.frame()
+for (fileID in names(fileMap)) {
+  picks <- rbind(picks,
+                 read.csv(paste0("data/GoTdeathPool_", fileID, ".csv")) %>% mutate(Person = fileMap[[fileID]]))
+}
 
 # Tabular datatables of each Person's picks, colored by correctness (correct: green, wrong: red, NA: gray/clear)
-picks_chars <- picks %>%
+picks_formatted <- picks %>%
   # filter(Person == "df" | Person == "key") %>%
   # Combine Alive.Dead and Wight.White.Walker
   mutate(Alive.Dead = case_when(!is.na(Wight.White.Walker) & Alive.Dead == "0" ~ "Dead",
@@ -40,38 +51,60 @@ picks_chars <- picks %>%
                                TRUE ~ Character)) %>%
   rename(Pick = "Alive.Dead",
          Wight = "Wight.White.Walker")
-# Split key from participants
-picks_key <- picks_chars %>% filter(Person == "key") %>% select(-Person)
-picks_chars <- picks_chars %>% 
-  filter(Person != "key")
 
-# Correctness
-picks_chars$correct <- NA
-for (char in picks_key$Character) {
-  picks_chars$correct[which(picks_chars$Character == char)] <- picks_chars$Pick[which(picks_chars$Character == char)] == picks_key$Pick[which(picks_key$Character == char)]
-  # set correct to FALSE if wight selected incorrectly
-  wight_key <- picks_key$Wight[which(picks_key$Character == char)]
-  picks_chars <- picks_chars %>%
-    mutate(correct = case_when(correct &
-                                 Character == char &
-                                 Wight == "1" &
-                                 wight_key == "0" ~ FALSE,
-                               TRUE ~ correct))
+picks_chars <- picks_formatted %>%
+  filter(!grepl("key", Person))
+
+###############
+## Standings ##
+###############
+
+all_standings <- data.frame(Person = unique(picks_chars$Person))
+for (week in 0:WEEK) {
+  # Split key from participants
+  picks_key <- picks_formatted %>% 
+    filter(Person == paste0("key", week),
+           !Character %in% ambiguousChars) %>%
+    select(-Person)
+  
+  # Correctness
+  picks_chars$correct <- NA
+  for (char in picks_key$Character) {
+    picks_chars$correct[which(picks_chars$Character == char)] <- picks_chars$Pick[which(picks_chars$Character == char)] == picks_key$Pick[which(picks_key$Character == char)]
+    # set correct to FALSE if wight selected incorrectly
+    wight_key <- picks_key$Wight[which(picks_key$Character == char)]
+    picks_chars <- picks_chars %>%
+      mutate(correct = case_when(correct &
+                                   Character == char &
+                                   Wight == "1" &
+                                   wight_key == "0" ~ FALSE,
+                                 TRUE ~ correct))
+  }
+  
+  standings <- picks_chars %>%
+    mutate(Score = case_when(correct & Wight == "1" ~ 2,
+                             correct ~ 1,
+                             TRUE ~ 0)) %>%
+    filter(!is.na(correct)) %>%
+    group_by(Person) %>%
+    summarise(!!paste0("week", week) := sum(Score))
+  
+  all_standings <- all_standings %>%
+    left_join(standings, by = "Person")
 }
 
-standings_last <- data.frame(previous = 1:9,
-                             Person = c("Neale","Andy","Tony","David","Mark","Bryan","Ryan","Maclay","Jasmine"))
+all_standings <- all_standings %>%
+  arrange(desc(!!rlang::sym(paste0("week", WEEK))), desc(!!rlang::sym(paste0("week", WEEK-1))))
 
-standings <- picks_chars %>%
-  mutate(Score = case_when(correct & Wight == "1" ~ 2,
-                           correct ~ 1,
-                           TRUE ~ 0)) %>%
-  group_by(Person) %>%
-  summarise(Score = sum(Score)) %>%
-  mutate(Person = c("Andy", "Maclay", "Bryan", "David", "Jasmine", "Mark", "Neale", "Ryan", "Tony")) %>%
-  left_join(standings_last, by = "Person") %>%
-  arrange(desc(Score), previous) %>%
-  dplyr::select(-previous)
+standings <- all_standings[c(1, ncol(all_standings))] %>%
+  rename(Score = paste0("week", WEEK))
+
+all_standings <- all_standings %>%
+  gather("week", "score", -Person)
+
+#############
+## Display ##
+#############
 
 # Overwrite Pick label if wight
 picks_chars <- picks_chars %>%
@@ -139,7 +172,30 @@ for (char in unique(picks_chars$Character)) {
   i <- i + 1
 }
 
+trace_al <- all_standings %>% filter(Person == "Andy")
+trace_bw <- all_standings %>% filter(Person == "Bryan") %>% pull(score)
+trace_df <- all_standings %>% filter(Person == "David") %>% pull(score)
+trace_jk <- all_standings %>% filter(Person == "Jasmine") %>% pull(score)
+trace_ms <- all_standings %>% filter(Person == "Mark") %>% pull(score)
+trace_ng <- all_standings %>% filter(Person == "Neale") %>% pull(score)
+trace_rf <- all_standings %>% filter(Person == "Ryan") %>% pull(score)
+trace_td <- all_standings %>% filter(Person == "Tony") %>% pull(score)
+trace_am <- all_standings %>% filter(Person == "Maclay") %>% pull(score)
+
+standingsProgression <- plot_ly(trace_al, name = "Andy", mode = 'lines+markers',
+                                x = ~week, y = ~score, type = 'scatter', height = '300', width = '500') %>%
+  add_trace(y = ~trace_bw, name = 'Bryan', mode = 'lines+markers') %>%
+  add_trace(y = ~trace_df, name = 'Tony', mode = 'lines+markers') %>%
+  add_trace(y = ~trace_jk, name = 'Jasmine', mode = 'lines+markers') %>%
+  add_trace(y = ~trace_ms, name = 'Mark', mode = 'lines+markers') %>%
+  add_trace(y = ~trace_ng, name = 'Neale', mode = 'lines+markers') %>%
+  add_trace(y = ~trace_rf, name = 'Ryan', mode = 'lines+markers') %>%
+  add_trace(y = ~trace_td, name = 'Tony', mode = 'lines+markers') %>%
+  add_trace(y = ~trace_am, name = 'Maclay', mode = 'lines+markers') %>%
+  config(displayModeBar = FALSE) %>%
+  layout(xaxis = list(title = "", tickangle = -45), yaxis = list(title = ""))
+
 save(standings, picks_key, picks_chars, char_death, file = "data/data.RData")
 
 rmarkdown::render('GoTdeathPool.Rmd',output_file = "index.html")
-
+rmarkdown::render('picksDistribution.Rmd',output_file = "picks.html")

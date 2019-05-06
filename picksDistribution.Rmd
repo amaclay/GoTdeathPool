@@ -1,0 +1,105 @@
+---
+title: "Game of Thrones Death Pool"
+runtime: shiny
+output: html_document
+---
+<style>
+.plotly {
+height: 225px !important;
+}
+.datatables {
+max-width: 100% !important;
+}
+.nav-tabs {
+max-width: 100% !important;
+}
+</style>
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Load resources
+setwd("~/Documents/Entertainment/GoTdeathPool")
+library(shiny)
+library(tidyverse)
+library(DT)
+library(plotly)
+
+load("data/data.RData")
+```
+
+<center> <h1> Pick Distribution </h1> </center> <br>
+```{r plots, echo=FALSE}
+
+groups <- list(
+  "Starks" = c("Jon Snow", "Sansa Stark", "Arya Stark", "Bran Stark", "Davos Seaworth", "Ghost"),
+  "Lannisters" = c("Cersi Lannister", "Jaime Lannister", "Tyrion Lannister", "The Mountain", "Bronn"),
+  "Danny&Co." = c("Daenerys Targaryen", "Missandei", "Jorah Mormont", "Grey Worm", "Lord Varys", "Drogon", "Rhaegal"),
+  "Greyjoys" = c("Yara Greyjoy", "Theon Greyjoy", "Euron Greyjoy"),
+  "Lord of Light" = c("Melisandre", "Beric Dondarrion", "The Hound"),
+  "Other Northerners" = c("Gendry", "Samwell Tarly", "Gilly", "Sam Jr.", "Brienne of Tarth", "Podrick Payne", "Hot Pie", "Lyanna Mormont"),
+  "Tormund" = c("Tormund Giantsbane"),
+  "Who?" = c("Meera Reed", "Robert Arryn", "Edmure Tully", "Qyburn", "Daario Naharis", "Elia Sand"),
+  "Questions" = c("Danny Pregnant", "Baby Survives", "NK Dies", "NK Killer", "7 Kingdoms Champ"))
+
+fluidRow(
+  div(style = "height:600px",
+      tabsetPanel(
+        tabPanel(names(groups[1]),
+                 br(),
+                 lapply(unlist(unname(groups[1])),
+                        function (x) column(width = 3,
+                                            char_death[[x]]))
+        ),
+        tabPanel(names(groups[2]),
+                 br(),
+                 lapply(unlist(unname(groups[2])),
+                        function (x) column(width = 3,
+                                            char_death[[x]]))
+        ), 
+        tabPanel(names(groups[3]),
+                 br(),
+                 lapply(unlist(unname(groups[3])),
+                        function (x) column(width = 3,
+                                            char_death[[x]]))
+        ), 
+        tabPanel(names(groups[4]),
+                 br(),
+                 lapply(unlist(unname(groups[4])),
+                        function (x) column(width = 3,
+                                            char_death[[x]]))
+        ), 
+        tabPanel(names(groups[5]),
+                 br(),
+                 lapply(unlist(unname(groups[5])),
+                        function (x) column(width = 3,
+                                            char_death[[x]]))
+        ), 
+        tabPanel(names(groups[6]),
+                 br(),
+                 lapply(unlist(unname(groups[6])),
+                        function (x) column(width = 3,
+                                            char_death[[x]]))
+        ), 
+        tabPanel(names(groups[7]),
+                 br(),
+                 lapply(unlist(unname(groups[7])),
+                        function (x) column(width = 3,
+                                            char_death[[x]]))
+        ), 
+        tabPanel(names(groups[8]),
+                 br(),
+                 lapply(unlist(unname(groups[8])),
+                        function (x) column(width = 3,
+                                            char_death[[x]]))
+        ),
+        tabPanel(names(groups[9]),
+                 br(),
+                 lapply(unlist(unname(groups[9])),
+                        function (x) column(width = 3,
+                                            char_death[[x]]))
+        )
+      )
+  )
+)
+```
+
+

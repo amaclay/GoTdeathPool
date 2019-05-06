@@ -32,121 +32,38 @@ load("data/data.RData")
 
 fluidRow(
   column(6,
-    div(style = "height:63px;margin:auto;", h2("Standings")),
     #standings
-    datatable(standings, options = list(paging = F, searching = F, info = F, w = F))),
+    div(style = "margin:40px 10px 0px", h2("Standings")),
+    div(style = "height:380px;", datatable(standings, options = list(paging = F, searching = F, info = F, w = F))),
+    div(style = "margin-left:10px", h2("Progression")),
+    div(style = "position:relative;left:-40px;", standingsProgression)),
   column(6, tabsetPanel(
-    tabPanel("Pick", datatable(picks_key , options = list(scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F)), 
-    tabPanel("Andy", datatable(picks_chars %>% filter(Person == "al") %>% select(-Person), options = list(scrollY = "500px", scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
+    tabPanel("Pick", datatable(picks_key, options = list(scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = 2, visible = F))), rownames=F)), 
+    tabPanel("Andy", datatable(picks_chars %>% filter(Person == "Andy") %>% select(-Person), options = list(scrollY = "600px", scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
               formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-    tabPanel("Bryan", datatable(picks_chars %>% filter(Person == "bw") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
+    tabPanel("Bryan", datatable(picks_chars %>% filter(Person == "Bryan") %>% select(-Person), options = list(scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
               formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-    tabPanel("David", datatable(picks_chars %>% filter(Person == "df") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
+    tabPanel("David", datatable(picks_chars %>% filter(Person == "David") %>% select(-Person), options = list(scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
               formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-    tabPanel("Jasmine", datatable(picks_chars %>% filter(Person == "jk") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
+    tabPanel("Jasmine", datatable(picks_chars %>% filter(Person == "Jasmine") %>% select(-Person), options = list(scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
               formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-    tabPanel("Maclay", datatable(picks_chars %>% filter(Person == "am") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
+    tabPanel("Maclay", datatable(picks_chars %>% filter(Person == "Maclay") %>% select(-Person), options = list(scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
              formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-    tabPanel("Mark", datatable(picks_chars %>% filter(Person == "ms") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
+    tabPanel("Mark", datatable(picks_chars %>% filter(Person == "Mark") %>% select(-Person), options = list(scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
            formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-    tabPanel("Neale", datatable(picks_chars %>% filter(Person == "ng") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
+    tabPanel("Neale", datatable(picks_chars %>% filter(Person == "Neale") %>% select(-Person), options = list(scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
             formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-    tabPanel("Ryan", datatable(picks_chars %>% filter(Person == "rf") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
+    tabPanel("Ryan", datatable(picks_chars %>% filter(Person == "Ryan") %>% select(-Person), options = list(scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
            formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE')))), 
-    tabPanel("Tony", datatable(picks_chars %>% filter(Person == "td") %>% select(-Person), options = list(scrollY = "500px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
+    tabPanel("Tony", datatable(picks_chars %>% filter(Person == "Tony") %>% select(-Person), options = list(scrollY = "600px", paging=F, searching=F, info=F, columnDefs = list(list(targets = c(2,3), visible = F))), rownames=F) %>%
            formatStyle("Pick", "correct", backgroundColor = styleEqual(c("1", "0"), c('#C3D89E', '#FEC6CE'))))
-)))
-br()
+  ),
+  div(style="margin-top:140px;padding:10px 15px 25px;color:gray;",
+      "* Gettings these picks right gives you a large advantage in the standings (i.e. root for that character to die/survive)")
+))
 
 ```
-<div class="col-md-6 col-md-offset-6" style="padding:10px 15px 25px;color:gray;">&#42; Gettings these picks right gives you a large advantage in the standings (i.e. root for that character to die/survive)</div>
 
-<center> <h1> Pick Distribution </h1> </center> <br>
-```{r plots, echo=FALSE}
-
-groups <- list(
-  "Starks" = c("Jon Snow", "Sansa Stark", "Arya Stark", "Bran Stark", "Davos Seaworth", "Ghost"),
-  "Lannisters" = c("Cersi Lannister", "Jaime Lannister", "Tyrion Lannister", "The Mountain", "Bronn"),
-  "Danny&Co." = c("Daenerys Targaryen", "Missandei", "Jorah Mormont", "Grey Worm", "Lord Varys", "Drogon", "Rhaegal"),
-  "Greyjoys" = c("Yara Greyjoy", "Theon Greyjoy", "Euron Greyjoy"),
-  "Lord of Light" = c("Melisandre", "Beric Dondarrion", "The Hound"),
-  "Other Northerners" = c("Gendry", "Samwell Tarly", "Gilly", "Sam Jr.", "Brienne of Tarth", "Podrick Payne", "Hot Pie", "Lyanna Mormont"),
-  "Tormund" = c("Tormund Giantsbane"),
-  "Who?" = c("Meera Reed", "Robert Arryn", "Edmure Tully", "Qyburn", "Daario Naharis", "Elia Sand"),
-  "Questions" = c("Danny Pregnant", "Baby Survives", "NK Dies", "NK Killer", "7 Kingdoms Champ"))
-
-# mytabs <- sapply(groups, function(x) {
-#   print(names(x))
-#   tabPanel(names(x),
-#            lapply(x, function(y) {
-#              print(y)
-#              column(width = 3,
-#                     char_death[[y]])
-#              })
-#   )
-# }, USE.NAMES = T)
-# do.call(tabsetPanel, mytabs)
-
-fluidRow(
-  div(style = "height:600px",
-      tabsetPanel(
-        tabPanel(names(groups[1]),
-                 br(),
-                 lapply(unlist(unname(groups[1])),
-                        function (x) column(width = 3,
-                                            char_death[[x]]))
-        ),
-        tabPanel(names(groups[2]),
-                 br(),
-                 lapply(unlist(unname(groups[2])),
-                        function (x) column(width = 3,
-                                            char_death[[x]]))
-        ), 
-        tabPanel(names(groups[3]),
-                 br(),
-                 lapply(unlist(unname(groups[3])),
-                        function (x) column(width = 3,
-                                            char_death[[x]]))
-        ), 
-        tabPanel(names(groups[4]),
-                 br(),
-                 lapply(unlist(unname(groups[4])),
-                        function (x) column(width = 3,
-                                            char_death[[x]]))
-        ), 
-        tabPanel(names(groups[5]),
-                 br(),
-                 lapply(unlist(unname(groups[5])),
-                        function (x) column(width = 3,
-                                            char_death[[x]]))
-        ), 
-        tabPanel(names(groups[6]),
-                 br(),
-                 lapply(unlist(unname(groups[6])),
-                        function (x) column(width = 3,
-                                            char_death[[x]]))
-        ), 
-        tabPanel(names(groups[7]),
-                 br(),
-                 lapply(unlist(unname(groups[7])),
-                        function (x) column(width = 3,
-                                            char_death[[x]]))
-        ), 
-        tabPanel(names(groups[8]),
-                 br(),
-                 lapply(unlist(unname(groups[8])),
-                        function (x) column(width = 3,
-                                            char_death[[x]]))
-        ),
-        tabPanel(names(groups[9]),
-                 br(),
-                 lapply(unlist(unname(groups[9])),
-                        function (x) column(width = 3,
-                                            char_death[[x]]))
-        )
-      )
-  )
-)
-```
-
-
+<div style="padding:80px 0px 40px;">
+<button style="margin:auto;font-size:30px;display:block;" onclick="window.location.href = 'https://amaclay.github.io/GoTdeathPool/picks.html';">Pick Distribution</button>
+</div>
