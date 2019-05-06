@@ -59,6 +59,9 @@ for (char in picks_key$Character) {
                                TRUE ~ correct))
 }
 
+standings_last <- data.frame(previous = 1:9,
+                             Person = c("Neale","Andy","Tony","David","Mark","Bryan","Ryan","Maclay","Jasmine"))
+
 standings <- picks_chars %>%
   mutate(Score = case_when(correct & Wight == "1" ~ 2,
                            correct ~ 1,
@@ -66,7 +69,9 @@ standings <- picks_chars %>%
   group_by(Person) %>%
   summarise(Score = sum(Score)) %>%
   mutate(Person = c("Andy", "Maclay", "Bryan", "David", "Jasmine", "Mark", "Neale", "Ryan", "Tony")) %>%
-  arrange(desc(Score))
+  left_join(standings_last, by = "Person") %>%
+  arrange(desc(Score), previous) %>%
+  dplyr::select(-previous)
 
 # Overwrite Pick label if wight
 picks_chars <- picks_chars %>%
@@ -136,5 +141,5 @@ for (char in unique(picks_chars$Character)) {
 
 save(standings, picks_key, picks_chars, char_death, file = "data/data.RData")
 
-# rmarkdown::render('GoTdeathPool.Rmd',output_file = "index.html")
+rmarkdown::render('GoTdeathPool.Rmd',output_file = "index.html")
 
