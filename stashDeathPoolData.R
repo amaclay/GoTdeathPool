@@ -95,21 +95,27 @@ for (week in 0:WEEK) {
     left_join(standings, by = "Person")
 }
 
+# Sort by score this week, then by score last week
 all_standings <- all_standings %>%
   arrange(desc(!!rlang::sym(paste0("week", WEEK))), desc(!!rlang::sym(paste0("week", WEEK-1))))
 
+# Select recent standings for disply
 standings <- all_standings[c(1, ncol(all_standings))] %>%
   rename(Score = paste0("week", WEEK))
-
-all_standings <- all_standings %>%
-  gather("week", "score", -Person)
 
 #############
 ## Display ##
 #############
 
+# Format all_standings for plotly
+all_standings <- all_standings %>%
+  gather("week", "score", -Person)
+
 # Overwrite Pick label if wight
 picks_chars <- picks_chars %>%
+  mutate(Pick = case_when(Wight == "1" ~ "Wight",
+                          TRUE ~ Pick))
+picks_key <- picks_key %>%
   mutate(Pick = case_when(Wight == "1" ~ "Wight",
                           TRUE ~ Pick))
 
