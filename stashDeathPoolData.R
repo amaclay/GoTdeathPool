@@ -10,7 +10,7 @@ library(plotly)
 
 options(stringsAsFactors = F)
 
-WEEK <- 4
+WEEK <- 5
 ambiguousChars <- c("Hot Pie", "Meera Reed", "Robert Arryn", "Edmure Tully", "Daario Naharis", "Elia Sand")
 
 fileMap <- c(key_week0 = "key0",
@@ -18,6 +18,7 @@ fileMap <- c(key_week0 = "key0",
              key_week2 = "key2",
              key_week3 = "key3",
              key_week4 = "key4",
+             key_week5 = "key5",
              al = "Andy",
              bw = "Bryan",
              df = "David",
@@ -102,6 +103,7 @@ all_standings <- all_standings %>%
 # Select recent standings for disply
 standings <- all_standings[c(1, ncol(all_standings))] %>%
   rename(Score = paste0("week", WEEK))
+print(standings)
 
 #############
 ## Display ##
@@ -203,7 +205,7 @@ standingsProgression <- plot_ly(trace_al, name = "Andy", mode = 'lines+markers',
   config(displayModeBar = FALSE) %>%
   layout(xaxis = list(title = "", tickangle = -45), yaxis = list(title = ""))
 
-save(standings, picks_key, picks_chars, char_death, file = "data/data.RData")
+save(standings, all_standings, picks_key, picks_chars, char_death, file = "data/data.RData")
 
 rmarkdown::render('GoTdeathPool.Rmd',output_file = "index.html")
 rmarkdown::render('picksDistribution.Rmd',output_file = "picks.html")
