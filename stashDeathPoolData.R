@@ -10,7 +10,7 @@ library(plotly)
 
 options(stringsAsFactors = F)
 
-WEEK <- 5
+WEEK <- 6
 ambiguousChars <- c("Hot Pie", "Meera Reed", "Robert Arryn", "Edmure Tully", "Daario Naharis", "Elia Sand")
 
 fileMap <- c(key_week0 = "key0",
@@ -19,6 +19,7 @@ fileMap <- c(key_week0 = "key0",
              key_week3 = "key3",
              key_week4 = "key4",
              key_week5 = "key5",
+             key_week6 = "key6",
              al = "Andy",
              bw = "Bryan",
              df = "David",
