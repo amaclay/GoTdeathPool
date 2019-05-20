@@ -11,7 +11,7 @@ library(plotly)
 options(stringsAsFactors = F)
 
 WEEK <- 6
-ambiguousChars <- c("Hot Pie", "Meera Reed", "Robert Arryn", "Edmure Tully", "Daario Naharis", "Elia Sand")
+ambiguousChars <- c("Hot Pie", "Meera Reed", "Daario Naharis", "Elia Sand")
 
 fileMap <- c(key_week0 = "key0",
              key_week1 = "key1",
